@@ -6,7 +6,7 @@
     "Alexandr Korsak <alex.korsak@gmail.com>"
   ],
   "description": "Angular directive for showing image spinner in the container with image",
-  "main": "angular-image-spinner.js",
+  "main": "dist/angular-image-spinner.js",
   "keywords": [
     "angular",
     "directive",
