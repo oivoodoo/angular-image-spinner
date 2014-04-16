@@ -2,5 +2,6 @@
 app/bower_components
 node_modules/
 app/scripts/
-dist/
 .tmp/
+dist/bower_components
+
