@@ -1,6 +1,8 @@
-# Angular Struct
+# Angular Image Spinner
 
-## Model, Collection classes
+```html
+  <img src='your-path-to-image' image-spinner />
+```
 
-For the faster prototyping the pages using models approach with no $resource connections, dealing with the objects only.
+You will see the spinner until your image is loaded.
 
