@@ -22,7 +22,9 @@
     "tests",
     "Gruntfile.js",
     ".gitignore",
-    "package.json"
+    "package.json",
+    "app",
+    "karma.conf.js"
   ],
   "dependencies": {
     "spin.js": "~2.0.0",
