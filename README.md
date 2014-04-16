@@ -1,8 +1,12 @@
 # Angular Image Spinner
 
+Using [spin.js](http://fgnass.github.com/spin.js) showing the spinner while
+image is preloading on the background.
+
 ```html
-  <img src='your-path-to-image' image-spinner />
+  <img src='http://www.example.com/image.jpg' image-spinner width=100 height=200 />
 ```
 
-You will see the spinner until your image is loaded.
+Also it's possible to pass spin.js settings using ```image-spinner-settings```
+attribute for ```img``` element.
 
