@@ -1,7 +1,7 @@
 describe 'imageSpinner', ->
-    example1 = null
-    scope    = null
-    image    = null
+    example = null
+    scope   = null
+    image   = null
 
     class ImageMock
         constructor: ->
@@ -13,47 +13,59 @@ describe 'imageSpinner', ->
         $provide.value '$window', Image: ImageMock
         return
 
+    Example =
+        create: ($compile, template) ->
+            example = $ """
+              <div>
+                #{template}
+              </div>
+            """
+            $compile(example)(scope)
+            example
+
     beforeEach inject ($rootScope, $compile) ->
-        example1 = angular.element """
-          <div id='example1'>
-              <img src='http://www.example.com/bart.jpg' width='100' height='100' image-spinner />
-          </div>
-        """
-
-        angular.element(document.querySelector('#example1')).remove()
-        document.body.appendChild(example1[0])
-
-        example1 = angular.element(document.querySelector('#example1'))
-
         scope = $rootScope
-        $compile(example1)(scope)
-        return
 
-    it 'should be hidden by default on load of the image', ->
-        expect(example1.find('img').css('display')).toEqual('none')
+    describe 'with good img', ->
+        beforeEach inject ($rootScope, $compile) ->
+            Example.create $compile, """
+              <img src='http://www.example.com/bart.jpg' width='100' height='100' image-spinner />
+            """
+            # example3 = createExample 'example3', """
+            #   <img src='http://www.example.com/bart.jpg' width='100' height='' image-spinner />
+            # """
+            # example4 = createExample 'example4', """
+            #   <img src='http://www.example.com/bart.jpg' width='' height='100' image-spinner />
+            # """
+            return
 
-    it 'should wrap image by container with spinner', ->
-        expect(example1
-            .find('div')
-            .attr('class')
-        ).toEqual('spinner-container')
+        it 'should be hidden by default on load of the image', ->
+            expect(example.find('img').css('display')).toEqual('none')
 
-        expect(example1
-            .find('div')
-            .find('img').length
-        ).toEqual(1)
+        it 'should wrap image by container with spinner', ->
+            expect(example.find('.spinner-container img').length).toEqual(1)
 
-    it 'should show image on load', ->
-        image.onload()
-        expect(example1
-            .find('div')
-            .find('img').css('display')
-        ).toEqual('block')
+        it 'should show image on load', ->
+            image.onload()
+            expect(example
+                .find('div')
+                .find('img').css('display')
+            ).toEqual('block')
 
-    it 'should create the spinner in the container unlil the image is loaded', ->
-        expect(document.querySelector('.spinner-container .spinner')).not.toBe(null)
+        it 'should create the spinner in the container unlil the image is loaded', ->
+            expect(example.find('.spinner-container .spinner').length).toEqual(1)
 
-    it 'should hide the spinner in case of loaded image', ->
-        image.onload()
-        expect(document.querySelector('.spinner-container .spinner')).toBe(null)
+        it 'should hide the spinner in case of loaded image', ->
+            image.onload()
+            expect(example.find('.spinner-container .spinner').length).toEqual(0)
+
+    describe 'with missing src', ->
+        beforeEach inject ($rootScope, $compile) ->
+            Example.create $compile, """
+              <img src='' width='100' height='100' image-spinner />
+            """
+            return
+
+        it 'should not show image spinner', ->
+            expect(example.find('.spinner-container .spinner').length).toEqual(0)
 

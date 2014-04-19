@@ -110,7 +110,14 @@ module.exports = function (grunt) {
 
     karma: {
       unit: {
-        configFile : 'karma.conf.js'
+        configFile : 'karma.conf.js',
+        singleRun  : true,
+        browsers   : ['PhantomJS']
+      },
+      debug: {
+        configFile : 'karma.conf.js',
+        singleRun  : false,
+        browsers   : ['Chrome']
       }
     }
   });
@@ -118,7 +125,13 @@ module.exports = function (grunt) {
   grunt.registerTask('test', [
     'clean:server',
     'coffee',
-    'karma'
+    'karma:unit'
+  ]);
+
+  grunt.registerTask('debug', [
+    'clean:server',
+    'coffee',
+    'karma:debug'
   ]);
 
   grunt.registerTask('build', [

@@ -63,7 +63,14 @@ angular.module('imageSpinner')
 
         SPINNER_CLASS_NAME = 'spinner-container'
 
+        isEmpty = (value) ->
+            value is undefined or
+            value is null or
+            value is ''
+
         link = (scope, element, attributes) ->
+            return if isEmpty(angular.element(element).attr('src'))
+
             # Wrap img by container with fixed width, height using the img
             # attributes width and height
             container = angular.

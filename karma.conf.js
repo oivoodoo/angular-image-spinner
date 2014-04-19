@@ -14,6 +14,7 @@ module.exports = function(config) {
         'app/bower_components/angular/angular.js',
         'app/bower_components/angular-mocks/angular-mocks.js',
         'app/bower_components/spin.js/spin.js',
+        'app/bower_components/jquery/dist/jquery.min.js',
         'node_modules/sinon/pkg/sinon.js',
         'node_modules/jasmine-sinon/lib/jasmine-sinon.js',
         'app/scripts/app.js',
