@@ -29,7 +29,7 @@
     '$window',
     'imageSpinnerDefaultSettings',
     function ($window, DefaultSettings) {
-      var ImageLoader, SPINNER_CLASS_NAME, SpinnerBuilder, link;
+      var ImageLoader, SPINNER_CLASS_NAME, SpinnerBuilder, isEmpty, link;
       ImageLoader = $window.Image;
       SpinnerBuilder = function () {
         function SpinnerBuilder(el, settings) {
@@ -67,18 +67,29 @@
         return SpinnerBuilder;
       }();
       SPINNER_CLASS_NAME = 'spinner-container';
+      isEmpty = function (value) {
+        return value === void 0 || value === null || value === '';
+      };
       link = function (scope, element, attributes) {
-        var container, image, settings, spinner;
+        var container, image, render;
         container = angular.element('<div>').addClass(SPINNER_CLASS_NAME);
         element.wrap(container);
         image = angular.element(element);
-        settings = attributes.imageSpinnerSettings;
-        if (settings == null) {
-          settings = {};
-        }
-        settings = scope.$eval(settings);
-        spinner = new SpinnerBuilder(image, settings);
-        return spinner.show();
+        render = function (src) {
+          var settings, spinner;
+          if (isEmpty(src) || isEmpty(image.attr('width')) || isEmpty(image.attr('height'))) {
+            return;
+          }
+          settings = attributes.imageSpinnerSettings;
+          if (settings == null) {
+            settings = {};
+          }
+          settings = scope.$eval(settings);
+          spinner = new SpinnerBuilder(image, settings);
+          return spinner.show();
+        };
+        attributes.$observe('ng-src', render);
+        return attributes.$observe('src', render);
       };
       return { link: link };
     }
