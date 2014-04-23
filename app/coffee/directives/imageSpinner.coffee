@@ -69,8 +69,6 @@ angular.module('imageSpinner')
             value is ''
 
         link = (scope, element, attributes) ->
-            return if isEmpty(angular.element(element).attr('src'))
-
             # Wrap img by container with fixed width, height using the img
             # attributes width and height
             container = angular.
@@ -78,17 +76,25 @@ angular.module('imageSpinner')
                 addClass(SPINNER_CLASS_NAME)
             element.wrap(container)
 
-            image    = angular.element(element)
+            image = angular.element(element)
 
-            # in case if user passed hash with setting using
-            # image-spinner-settings attribute we will eval it and pass to the
-            # spin.js
-            settings = attributes.imageSpinnerSettings
-            settings ?= {}
-            settings = scope.$eval(settings)
+            render = (src) ->
+                return if isEmpty(src) ||
+                    isEmpty(image.attr('width')) ||
+                    isEmpty(image.attr('height'))
 
-            spinner = new SpinnerBuilder(image, settings)
-            spinner.show()
+                # In case if user passed hash with setting using
+                # image-spinner-settings attribute we will eval it and pass to the
+                # spin.js
+                settings = attributes.imageSpinnerSettings
+                settings ?= {}
+                settings = scope.$eval(settings)
+
+                spinner = new SpinnerBuilder(image, settings)
+                spinner.show()
+
+            attributes.$observe 'ng-src' , render
+            attributes.$observe 'src'    , render
 
         return {
             link : link

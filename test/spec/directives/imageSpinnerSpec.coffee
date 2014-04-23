@@ -31,12 +31,7 @@ describe 'imageSpinner', ->
             Example.create $compile, """
               <img src='http://www.example.com/bart.jpg' width='100' height='100' image-spinner />
             """
-            # example3 = createExample 'example3', """
-            #   <img src='http://www.example.com/bart.jpg' width='100' height='' image-spinner />
-            # """
-            # example4 = createExample 'example4', """
-            #   <img src='http://www.example.com/bart.jpg' width='' height='100' image-spinner />
-            # """
+            scope.$digest()
             return
 
         it 'should be hidden by default on load of the image', ->
@@ -59,13 +54,56 @@ describe 'imageSpinner', ->
             image.onload()
             expect(example.find('.spinner-container .spinner').length).toEqual(0)
 
+    describe 'with missing width', ->
+        beforeEach inject ($rootScope, $compile) ->
+            Example.create $compile, """
+              <img src='http://www.example.com/bart.jpg' width='' height='100' image-spinner />
+            """
+            scope.$digest()
+            return
+
+        it 'should not show image spinner', ->
+            expect(example.find('.spinner-container .spinner').length).toEqual(0)
+
+    describe 'with missing height', ->
+        beforeEach inject ($rootScope, $compile) ->
+            Example.create $compile, """
+              <img src='http://www.example.com/bart.jpg' width='100' height='' image-spinner />
+            """
+            scope.$digest()
+            return
+
+        it 'should not show image spinner', ->
+            expect(example.find('.spinner-container .spinner').length).toEqual(0)
+
     describe 'with missing src', ->
         beforeEach inject ($rootScope, $compile) ->
             Example.create $compile, """
               <img src='' width='100' height='100' image-spinner />
             """
+            scope.$digest()
             return
 
         it 'should not show image spinner', ->
             expect(example.find('.spinner-container .spinner').length).toEqual(0)
+
+    describe 'with changed src on $digest', ->
+        beforeEach inject ($rootScope, $compile) ->
+            Example.create $compile, """
+              <img ng-src='{{url}}' width='100' height='100' image-spinner />
+            """
+            scope.$digest()
+            return
+
+        it 'should not show image spinner', ->
+            scope.url = null
+            scope.$digest()
+            expect(example.find('.spinner-container .spinner').length).toEqual(0)
+
+        it 'should show image spinner in case of getting on the next digest cycle src', ->
+            scope.url = null
+            scope.$digest()
+            scope.url = 'http://www.example.com/bart.jpg'
+            scope.$digest()
+            expect(example.find('.spinner-container .spinner').length).toEqual(1)
 
