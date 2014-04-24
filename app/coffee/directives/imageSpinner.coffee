@@ -107,6 +107,8 @@ angular.module('imageSpinner')
             attributes.$observe 'src'    , render
 
         return {
-            link : link
+            restrict : 'A'
+            link     : link
+            scope    : {}
         }
 ]
