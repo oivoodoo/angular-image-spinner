@@ -1,5 +1,5 @@
 (function () {
-  angular.module('imageSpinner', []).value('version', '0.1.0');
+  angular.module('imageSpinner', []).value('version', '0.1.2');
 }.call(this));
 ;
 (function () {
@@ -33,7 +33,7 @@
       ImageLoader = $window.Image;
       SpinnerBuilder = function () {
         function SpinnerBuilder(el, settings) {
-          var loader, _this = this;
+          var _this = this;
           this.el = el;
           this.settings = settings;
           this.hide = __bind(this.hide, this);
@@ -43,34 +43,42 @@
           settings = angular.extend(settings, DefaultSettings);
           this.spinner = new Spinner(settings);
           this.container = this.el.parent();
-          this.setContainerSize();
-          loader = new ImageLoader();
-          loader.onload = function () {
+          angular.element(this.container).css('position', 'relative');
+          this.loader = new ImageLoader();
+          this.loader.onload = function () {
             return _this.hide();
           };
-          loader.src = this.el.attr('src');
         }
-        SpinnerBuilder.prototype.setContainerSize = function () {
-          var height, width;
-          width = this.el.attr('width') || '100';
-          height = this.el.attr('height') || '100';
+        SpinnerBuilder.prototype.setWidth = function (width) {
           width = '' + width.replace(/px/, '') + 'px';
+          return angular.element(this.container).css('width', width);
+        };
+        SpinnerBuilder.prototype.setHeight = function (height) {
           height = '' + height.replace(/px/, '') + 'px';
-          return angular.element(this.container).css('width', width).css('height', height).css('position', 'relative');
+          return angular.element(this.container).css('height', height);
         };
         SpinnerBuilder.prototype.show = function () {
+          this.loader.src = this.el.attr('src');
           this.el.css('display', 'none');
-          if (!this.hasSpinner) {
-            this.spinner.spin(this.container[0]);
-            return this.hasSpinner = true;
-          }
+          return this.spin();
         };
         SpinnerBuilder.prototype.hide = function () {
-          if (this.hasSpinner) {
-            this.spinner.stop();
-            this.hasSpinner = false;
-          }
+          this.unspin();
           return this.el.css('display', 'block');
+        };
+        SpinnerBuilder.prototype.spin = function () {
+          if (this.hasSpinner) {
+            return;
+          }
+          this.hasSpinner = true;
+          return this.spinner.spin(this.container[0]);
+        };
+        SpinnerBuilder.prototype.unspin = function () {
+          if (!this.hasSpinner) {
+            return;
+          }
+          this.hasSpinner = false;
+          return this.spinner.stop();
         };
         return SpinnerBuilder;
       }();
@@ -79,7 +87,7 @@
         return value === void 0 || value === null || value === '';
       };
       link = function (scope, element, attributes) {
-        var container, image, render, settings, _this = this;
+        var container, image, settings, spinner, _this = this;
         container = angular.element('<div>').addClass(SPINNER_CLASS_NAME);
         element.wrap(container);
         image = angular.element(element);
@@ -88,30 +96,47 @@
           settings = {};
         }
         settings = scope.$eval(settings);
-        this.spinner = new SpinnerBuilder(image, settings);
-        render = function (src) {
-          if (isEmpty(src) || isEmpty(image.attr('width')) || isEmpty(image.attr('height'))) {
-            return;
-          }
-          return _this.spinner.show();
-        };
-        scope.$watch(function () {
-          return !image.hasClass('ng-hide');
-        }, function (showable) {
-          if (showable == null) {
-            return;
-          }
-          if (showable) {
+        spinner = new SpinnerBuilder(image, settings);
+        return function (spinner) {
+          var render;
+          render = function (src) {
+            if (isEmpty(src) || isEmpty(image.attr('width')) || isEmpty(image.attr('height'))) {
+              return;
+            }
+            return spinner.show();
+          };
+          scope.$watch(function () {
+            return !image.hasClass('ng-hide');
+          }, function (showable) {
+            if (showable == null) {
+              return;
+            }
+            if (showable) {
+              return render(image.attr('src'));
+            } else {
+              return spinner.hide();
+            }
+          });
+          scope.$on('$destroy', function () {
+            return spinner.hide();
+          });
+          attributes.$observe('ng-src', render);
+          attributes.$observe('src', render);
+          attributes.$observe('width', function (width) {
+            if (isEmpty(width)) {
+              return;
+            }
+            spinner.setWidth(width);
             return render(image.attr('src'));
-          } else {
-            return _this.spinner.hide();
-          }
-        });
-        scope.$on('$destroy', function () {
-          return this.spinner.hide();
-        });
-        attributes.$observe('ng-src', render);
-        return attributes.$observe('src', render);
+          });
+          return attributes.$observe('height', function (height) {
+            if (isEmpty(height)) {
+              return;
+            }
+            spinner.setHeight(height);
+            return render(image.attr('src'));
+          });
+        }(spinner);
       };
       return {
         restrict: 'A',

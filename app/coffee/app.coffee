@@ -1,4 +1,4 @@
 angular.module('imageSpinner', [])
 
-.value('version', '0.1.2')
+.value('version', '0.1.3')
 
