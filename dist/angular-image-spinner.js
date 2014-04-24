@@ -1,5 +1,5 @@
 (function () {
-  angular.module('imageSpinner', []).value('version', '0.1.2');
+  angular.module('imageSpinner', []).value('version', '0.1.4');
 }.call(this));
 ;
 (function () {
@@ -36,7 +36,8 @@
           var _this = this;
           this.el = el;
           this.settings = settings;
-          this.hide = __bind(this.hide, this);
+          this.remove = __bind(this.remove, this);
+          this.disable = __bind(this.disable, this);
           if (settings == null) {
             settings = {};
           }
@@ -46,7 +47,7 @@
           angular.element(this.container).css('position', 'relative');
           this.loader = new ImageLoader();
           this.loader.onload = function () {
-            return _this.hide();
+            return _this.disable();
           };
         }
         SpinnerBuilder.prototype.setWidth = function (width) {
@@ -58,13 +59,17 @@
           return angular.element(this.container).css('height', height);
         };
         SpinnerBuilder.prototype.show = function () {
+          this.loading = true;
           this.loader.src = this.el.attr('src');
           this.el.css('display', 'none');
           return this.spin();
         };
-        SpinnerBuilder.prototype.hide = function () {
+        SpinnerBuilder.prototype.disable = function () {
           this.unspin();
           return this.el.css('display', 'block');
+        };
+        SpinnerBuilder.prototype.remove = function () {
+          return this.unspin();
         };
         SpinnerBuilder.prototype.spin = function () {
           if (this.hasSpinner) {
@@ -114,11 +119,11 @@
             if (showable) {
               return render(image.attr('src'));
             } else {
-              return spinner.hide();
+              return spinner.remove();
             }
           });
           scope.$on('$destroy', function () {
-            return spinner.hide();
+            return spinner.remove();
           });
           attributes.$observe('ng-src', render);
           attributes.$observe('src', render);
