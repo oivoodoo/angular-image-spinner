@@ -1,5 +1,5 @@
 (function () {
-  angular.module('imageSpinner', []).value('version', '0.0.5');
+  angular.module('imageSpinner', []).value('version', '0.1.0');
 }.call(this));
 ;
 (function () {
@@ -33,6 +33,7 @@
       ImageLoader = $window.Image;
       SpinnerBuilder = function () {
         function SpinnerBuilder(el, settings) {
+          var loader, _this = this;
           this.el = el;
           this.settings = settings;
           this.hide = __bind(this.hide, this);
@@ -43,6 +44,11 @@
           this.spinner = new Spinner(settings);
           this.container = this.el.parent();
           this.setContainerSize();
+          loader = new ImageLoader();
+          loader.onload = function () {
+            return _this.hide();
+          };
+          loader.src = this.el.attr('src');
         }
         SpinnerBuilder.prototype.setContainerSize = function () {
           var height, width;
@@ -53,15 +59,17 @@
           return angular.element(this.container).css('width', width).css('height', height).css('position', 'relative');
         };
         SpinnerBuilder.prototype.show = function () {
-          var loader;
           this.el.css('display', 'none');
-          this.spinner.spin(this.container[0]);
-          loader = new ImageLoader();
-          loader.onload = this.hide;
-          return loader.src = this.el.attr('src');
+          if (!this.hasSpinner) {
+            this.spinner.spin(this.container[0]);
+            return this.hasSpinner = true;
+          }
         };
         SpinnerBuilder.prototype.hide = function () {
-          this.spinner.stop();
+          if (this.hasSpinner) {
+            this.spinner.stop();
+            this.hasSpinner = false;
+          }
           return this.el.css('display', 'block');
         };
         return SpinnerBuilder;
@@ -71,23 +79,37 @@
         return value === void 0 || value === null || value === '';
       };
       link = function (scope, element, attributes) {
-        var container, image, render;
+        var container, image, render, settings, _this = this;
         container = angular.element('<div>').addClass(SPINNER_CLASS_NAME);
         element.wrap(container);
         image = angular.element(element);
+        settings = attributes.imageSpinnerSettings;
+        if (settings == null) {
+          settings = {};
+        }
+        settings = scope.$eval(settings);
+        this.spinner = new SpinnerBuilder(image, settings);
         render = function (src) {
-          var settings, spinner;
           if (isEmpty(src) || isEmpty(image.attr('width')) || isEmpty(image.attr('height'))) {
             return;
           }
-          settings = attributes.imageSpinnerSettings;
-          if (settings == null) {
-            settings = {};
-          }
-          settings = scope.$eval(settings);
-          spinner = new SpinnerBuilder(image, settings);
-          return spinner.show();
+          return _this.spinner.show();
         };
+        scope.$watch(function () {
+          return !image.hasClass('ng-hide');
+        }, function (showable) {
+          if (showable == null) {
+            return;
+          }
+          if (showable) {
+            return render(image.attr('src'));
+          } else {
+            return _this.spinner.hide();
+          }
+        });
+        scope.$on('$destroy', function () {
+          return this.spinner.hide();
+        });
         attributes.$observe('ng-src', render);
         return attributes.$observe('src', render);
       };
