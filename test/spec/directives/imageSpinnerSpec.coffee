@@ -119,6 +119,10 @@ describe 'imageSpinner', ->
             scope.has = false
             scope.$digest()
             expect(example.find('.spinner-container .spinner').length).toEqual(0)
+            expect(example
+                .find('div')
+                .find('img').css('display')
+            ).toEqual('none')
             scope.has = true
             scope.$digest()
             expect(example.find('.spinner-container .spinner').length).toEqual(1)

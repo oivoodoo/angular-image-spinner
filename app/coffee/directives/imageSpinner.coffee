@@ -36,7 +36,7 @@ angular.module('imageSpinner')
 
                 # wait until image is loading
                 @loader = new ImageLoader()
-                @loader.onload = => @hide()
+                @loader.onload = => @disable()
 
             setWidth: (width) ->
                 width  = "#{width.replace(/px/, '')}px"
@@ -49,14 +49,18 @@ angular.module('imageSpinner')
                     .css('height', height)
 
             show: ->
+                @loading = true
                 # set src for loading the image and show the spinner
                 @loader.src = @el.attr('src')
                 @el.css('display', 'none')
                 @spin()
 
-            hide: =>
+            disable: =>
                 @unspin()
                 @el.css('display', 'block')
+
+            remove: =>
+                @unspin()
 
             spin: ->
                 return if @hasSpinner
@@ -106,10 +110,10 @@ angular.module('imageSpinner')
                 # it's showable only.
                 scope.$watch (-> !image.hasClass('ng-hide')), (showable) ->
                     return unless showable?
-                    if showable then render(image.attr('src')) else spinner.hide()
+                    if showable then render(image.attr('src')) else spinner.remove()
 
                 scope.$on '$destroy', ->
-                    spinner.hide()
+                    spinner.remove()
 
                 attributes.$observe 'ng-src' , render
                 attributes.$observe 'src'    , render
