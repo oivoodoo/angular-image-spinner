@@ -110,10 +110,14 @@ angular.module('imageSpinner')
                 # it's showable only.
                 scope.$watch (-> !image.hasClass('ng-hide')), (showable) ->
                     return unless showable?
-                    debugger;
+
+                    src = image.attr('src')
+
                     if showable
-                        render(image.attr('src'))
-                        spinner.container.show()
+                        render(src)
+
+                        unless isEmpty(src)
+                            spinner.container.show()
                     else
                         spinner.unspin()
                         spinner.container.hide()
@@ -121,8 +125,15 @@ angular.module('imageSpinner')
                 scope.$on '$destroy', ->
                     spinner.container.hide()
 
-                attributes.$observe 'ng-src' , render
-                attributes.$observe 'src'    , render
+                attributes.$observe 'ng-src', (src) ->
+                    return if isEmpty(src)
+                    spinner.container.show()
+                    render(src)
+
+                attributes.$observe 'src', (src) ->
+                    return if isEmpty(src)
+                    spinner.container.show()
+                    render(src)
 
                 attributes.$observe 'width'  , (width) ->
                     return if isEmpty(width)

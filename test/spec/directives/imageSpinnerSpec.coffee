@@ -140,6 +140,32 @@ describe 'imageSpinner', ->
             scope.$digest()
             expect(example.find('.spinner-container .spinner').length).toEqual(1)
 
+    describe 'with ng-hide and src directive', ->
+        beforeEach inject ($rootScope, $compile) ->
+            Example.create $compile, """
+              <img ng-hide='!has' src='{{url}}' width='100' height='100' image-spinner />
+            """
+            scope.$digest()
+            return
+
+        it 'should not show image spinner', ->
+            scope.has = false
+            scope.url = null
+            scope.$digest()
+            expect(example.find('.spinner-container').css('display')).toEqual('none')
+            scope.has = true
+            scope.url = null
+            scope.$digest()
+            expect(example.find('.spinner-container').css('display')).toEqual('none')
+            scope.has = true
+            scope.url = 'url'
+            scope.$digest()
+            expect(example.find('.spinner-container').css('display')).toEqual('block')
+            scope.has = false
+            scope.url = 'url'
+            scope.$digest()
+            expect(example.find('.spinner-container').css('display')).toEqual('none')
+
     describe 'with ng-if directive', ->
         beforeEach inject ($rootScope, $compile) ->
             Example.create $compile, """
