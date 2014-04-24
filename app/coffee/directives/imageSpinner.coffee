@@ -33,6 +33,11 @@ angular.module('imageSpinner')
                 @container = @el.parent()
                 @setContainerSize()
 
+                # wait until image is loading
+                loader = new ImageLoader()
+                loader.onload = => @hide()
+                loader.src    = @el.attr('src')
+
             setContainerSize: ->
                 width  = @el.attr('width')  || '100'
                 height = @el.attr('height') || '100'
@@ -46,19 +51,14 @@ angular.module('imageSpinner')
                     .css('position' , 'relative')
 
             show: ->
-                # hide image because of preloading it
                 @el.css('display', 'none')
-
-                # append to the container
-                @spinner.spin(@container[0]);
-
-                # wait until image is loading
-                loader = new ImageLoader()
-                loader.onload = @hide
-                loader.src    = @el.attr('src')
-
+                unless @hasSpinner
+                    @spinner.spin(@container[0]);
+                    @hasSpinner = true
             hide: =>
-                @spinner.stop()
+                if @hasSpinner
+                    @spinner.stop()
+                    @hasSpinner = false
                 @el.css('display', 'block')
 
         SPINNER_CLASS_NAME = 'spinner-container'
@@ -78,20 +78,30 @@ angular.module('imageSpinner')
 
             image = angular.element(element)
 
-            render = (src) ->
+            # In case if user passed hash with setting using
+            # image-spinner-settings attribute we will eval it and pass to the
+            # spin.js
+            settings = attributes.imageSpinnerSettings
+            settings ?= {}
+            settings = scope.$eval(settings)
+
+            @spinner = new SpinnerBuilder(image, settings)
+
+            render = (src) =>
                 return if isEmpty(src) ||
                     isEmpty(image.attr('width')) ||
                     isEmpty(image.attr('height'))
+                @spinner.show()
 
-                # In case if user passed hash with setting using
-                # image-spinner-settings attribute we will eval it and pass to the
-                # spin.js
-                settings = attributes.imageSpinnerSettings
-                settings ?= {}
-                settings = scope.$eval(settings)
+            # If we are using ng-hide or ng-show directives we need to track
+            # the showable status for the img. Lets render spinner in case if
+            # it's showable only.
+            scope.$watch (-> !image.hasClass('ng-hide')), (showable) =>
+                return unless showable?
+                if showable then render(image.attr('src')) else @spinner.hide()
 
-                spinner = new SpinnerBuilder(image, settings)
-                spinner.show()
+            scope.$on '$destroy', ->
+                @spinner.hide()
 
             attributes.$observe 'ng-src' , render
             attributes.$observe 'src'    , render
@@ -100,4 +110,3 @@ angular.module('imageSpinner')
             link : link
         }
 ]
-

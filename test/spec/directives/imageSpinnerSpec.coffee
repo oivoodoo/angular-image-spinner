@@ -107,3 +107,59 @@ describe 'imageSpinner', ->
             scope.$digest()
             expect(example.find('.spinner-container .spinner').length).toEqual(1)
 
+    describe 'with ng-show directive', ->
+        beforeEach inject ($rootScope, $compile) ->
+            Example.create $compile, """
+              <img ng-show='has' src='http://www.example.com/bart.jpg' width='100' height='100' image-spinner />
+            """
+            scope.$digest()
+            return
+
+        it 'should not show image spinner', ->
+            scope.has = false
+            scope.$digest()
+            expect(example.find('.spinner-container .spinner').length).toEqual(0)
+            scope.has = true
+            scope.$digest()
+            expect(example.find('.spinner-container .spinner').length).toEqual(1)
+
+    describe 'with ng-hide directive', ->
+        beforeEach inject ($rootScope, $compile) ->
+            Example.create $compile, """
+              <img ng-hide='!has' src='http://www.example.com/bart.jpg' width='100' height='100' image-spinner />
+            """
+            scope.$digest()
+            return
+
+        it 'should not show image spinner', ->
+            scope.has = false
+            scope.$digest()
+            expect(example.find('.spinner-container .spinner').length).toEqual(0)
+            scope.has = true
+            scope.$digest()
+            expect(example.find('.spinner-container .spinner').length).toEqual(1)
+
+    describe 'with ng-if directive', ->
+        beforeEach inject ($rootScope, $compile) ->
+            Example.create $compile, """
+              <img ng-if='has' src='http://www.example.com/bart.jpg' width='100' height='100' image-spinner />
+            """
+            scope.$digest()
+            return
+
+        it 'should not show image spinner', ->
+            scope.has = false
+            scope.$digest()
+            expect(example.find('.spinner-container .spinner').length).toEqual(0)
+            scope.has = true
+            scope.$digest()
+            expect(example.find('.spinner-container .spinner').length).toEqual(1)
+
+        it 'should not show image spinner', ->
+            scope.has = true
+            scope.$digest()
+            expect(example.find('.spinner-container .spinner').length).toEqual(1)
+            scope.has = false
+            scope.$digest()
+            expect(example.find('.spinner-container .spinner').length).toEqual(0)
+
