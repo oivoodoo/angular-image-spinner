@@ -113,7 +113,11 @@
         attributes.$observe('ng-src', render);
         return attributes.$observe('src', render);
       };
-      return { link: link };
+      return {
+        restrict: 'A',
+        link: link,
+        scope: {}
+      };
     }
   ]);
 }.call(this));
