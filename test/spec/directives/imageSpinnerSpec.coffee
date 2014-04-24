@@ -163,3 +163,18 @@ describe 'imageSpinner', ->
             scope.$digest()
             expect(example.find('.spinner-container .spinner').length).toEqual(0)
 
+    describe 'with bindable width and height', ->
+        beforeEach inject ($rootScope, $compile) ->
+            Example.create $compile, """
+              <img src='http://www.example.com/bart.jpg' width='{{width}}' height='{{height}}' image-spinner />
+            """
+            scope.$digest()
+            return
+
+        it 'should calculate width and height for img', ->
+            scope.width  = 5
+            scope.height = 5
+            scope.$digest()
+            expect(example.find('.spinner-container').css('width')).toEqual("5px")
+            expect(example.find('.spinner-container').css('height')).toEqual("5px")
+

@@ -31,35 +31,42 @@ angular.module('imageSpinner')
                 @spinner = new Spinner(settings)
 
                 @container = @el.parent()
-                @setContainerSize()
+                angular.element(@container)
+                    .css('position', 'relative')
 
                 # wait until image is loading
-                loader = new ImageLoader()
-                loader.onload = => @hide()
-                loader.src    = @el.attr('src')
+                @loader = new ImageLoader()
+                @loader.onload = => @hide()
 
-            setContainerSize: ->
-                width  = @el.attr('width')  || '100'
-                height = @el.attr('height') || '100'
-
+            setWidth: (width) ->
                 width  = "#{width.replace(/px/, '')}px"
-                height = "#{height.replace(/px/, '')}px"
-
                 angular.element(@container)
-                    .css('width'    , width)
-                    .css('height'   , height)
-                    .css('position' , 'relative')
+                    .css('width', width)
+
+            setHeight: (height) ->
+                height  = "#{height.replace(/px/, '')}px"
+                angular.element(@container)
+                    .css('height', height)
 
             show: ->
+                # set src for loading the image and show the spinner
+                @loader.src = @el.attr('src')
                 @el.css('display', 'none')
-                unless @hasSpinner
-                    @spinner.spin(@container[0]);
-                    @hasSpinner = true
+                @spin()
+
             hide: =>
-                if @hasSpinner
-                    @spinner.stop()
-                    @hasSpinner = false
+                @unspin()
                 @el.css('display', 'block')
+
+            spin: ->
+                return if @hasSpinner
+                @hasSpinner = true
+                @spinner.spin(@container[0])
+
+            unspin: ->
+                return unless @hasSpinner
+                @hasSpinner = false
+                @spinner.stop()
 
         SPINNER_CLASS_NAME = 'spinner-container'
 
@@ -85,26 +92,37 @@ angular.module('imageSpinner')
             settings ?= {}
             settings = scope.$eval(settings)
 
-            @spinner = new SpinnerBuilder(image, settings)
+            spinner = new SpinnerBuilder(image, settings)
 
-            render = (src) =>
-                return if isEmpty(src) ||
-                    isEmpty(image.attr('width')) ||
-                    isEmpty(image.attr('height'))
-                @spinner.show()
+            do (spinner) =>
+                render = (src) ->
+                    return if isEmpty(src) ||
+                        isEmpty(image.attr('width')) ||
+                        isEmpty(image.attr('height'))
+                    spinner.show()
 
-            # If we are using ng-hide or ng-show directives we need to track
-            # the showable status for the img. Lets render spinner in case if
-            # it's showable only.
-            scope.$watch (-> !image.hasClass('ng-hide')), (showable) =>
-                return unless showable?
-                if showable then render(image.attr('src')) else @spinner.hide()
+                # If we are using ng-hide or ng-show directives we need to track
+                # the showable status for the img. Lets render spinner in case if
+                # it's showable only.
+                scope.$watch (-> !image.hasClass('ng-hide')), (showable) ->
+                    return unless showable?
+                    if showable then render(image.attr('src')) else spinner.hide()
 
-            scope.$on '$destroy', ->
-                @spinner.hide()
+                scope.$on '$destroy', ->
+                    spinner.hide()
 
-            attributes.$observe 'ng-src' , render
-            attributes.$observe 'src'    , render
+                attributes.$observe 'ng-src' , render
+                attributes.$observe 'src'    , render
+
+                attributes.$observe 'width'  , (width) ->
+                    return if isEmpty(width)
+                    spinner.setWidth(width)
+                    render(image.attr('src'))
+
+                attributes.$observe 'height' , (height) ->
+                    return if isEmpty(height)
+                    spinner.setHeight(height)
+                    render(image.attr('src'))
 
         return {
             restrict : 'A'
