@@ -105,15 +105,11 @@ angular.module('imageSpinner')
                         isEmpty(image.attr('height'))
                     spinner.show()
 
-                # If we are using ng-hide or ng-show directives we need to track
-                # the showable status for the img. Lets render spinner in case if
-                # it's showable only.
-                scope.$watch (-> !image.hasClass('ng-hide')), (showable) ->
-                    return unless showable?
 
+                flow = ->
                     src = image.attr('src')
 
-                    if showable
+                    if showable()
                         render(src)
 
                         unless isEmpty(src)
@@ -122,18 +118,26 @@ angular.module('imageSpinner')
                         spinner.unspin()
                         spinner.container.hide()
 
+                showable = ->
+                    !image.hasClass('ng-hide')
+
+                # If we are using ng-hide or ng-show directives we need to track
+                # the showable status for the img. Lets render spinner in case if
+                # it's showable only.
+                scope.$watch (-> showable()), (value) ->
+                    return unless value?
+                    flow()
+
                 scope.$on '$destroy', ->
                     spinner.container.hide()
 
                 attributes.$observe 'ng-src', (src) ->
                     return if isEmpty(src)
-                    spinner.container.show()
-                    render(src)
+                    flow()
 
                 attributes.$observe 'src', (src) ->
                     return if isEmpty(src)
-                    spinner.container.show()
-                    render(src)
+                    flow()
 
                 attributes.$observe 'width'  , (width) ->
                     return if isEmpty(width)

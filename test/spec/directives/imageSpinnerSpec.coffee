@@ -166,6 +166,22 @@ describe 'imageSpinner', ->
             scope.$digest()
             expect(example.find('.spinner-container').css('display')).toEqual('none')
 
+    describe 'with ng-hide class in the class attribute of the img  tag', ->
+        beforeEach inject ($rootScope, $compile) ->
+            Example.create $compile, """
+              <img src='{{url}}' class='ng-hide' width='100' height='100' image-spinner />
+            """
+            scope.$digest()
+            return
+
+        it 'should not show image spinner', ->
+            scope.url = null
+            scope.$digest()
+            expect(example.find('.spinner-container').css('display')).toEqual('none')
+            scope.url = 'url'
+            scope.$digest()
+            expect(example.find('.spinner-container').css('display')).toEqual('none')
+
     describe 'with ng-if directive', ->
         beforeEach inject ($rootScope, $compile) ->
             Example.create $compile, """
