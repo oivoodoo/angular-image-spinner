@@ -1,5 +1,5 @@
 (function () {
-  angular.module('imageSpinner', []).value('version', '0.1.4');
+  angular.module('imageSpinner', []).value('version', '0.1.5');
 }.call(this));
 ;
 (function () {
@@ -36,18 +36,22 @@
           var _this = this;
           this.el = el;
           this.settings = settings;
-          this.remove = __bind(this.remove, this);
-          this.disable = __bind(this.disable, this);
+          this.load = __bind(this.load, this);
           if (settings == null) {
             settings = {};
           }
           settings = angular.extend(settings, DefaultSettings);
           this.spinner = new Spinner(settings);
           this.container = this.el.parent();
-          angular.element(this.container).css('position', 'relative');
+          this.container.hide = function () {
+            return _this.container.css('display', 'none');
+          };
+          this.container.show = function () {
+            return _this.container.css('display', 'block');
+          };
           this.loader = new ImageLoader();
           this.loader.onload = function () {
-            return _this.disable();
+            return _this.load();
           };
         }
         SpinnerBuilder.prototype.setWidth = function (width) {
@@ -59,17 +63,14 @@
           return angular.element(this.container).css('height', height);
         };
         SpinnerBuilder.prototype.show = function () {
-          this.loading = true;
           this.loader.src = this.el.attr('src');
           this.el.css('display', 'none');
           return this.spin();
         };
-        SpinnerBuilder.prototype.disable = function () {
+        SpinnerBuilder.prototype.load = function () {
           this.unspin();
-          return this.el.css('display', 'block');
-        };
-        SpinnerBuilder.prototype.remove = function () {
-          return this.unspin();
+          this.el.css('display', 'block');
+          return this.container.css('display', 'block');
         };
         SpinnerBuilder.prototype.spin = function () {
           if (this.hasSpinner) {
@@ -93,7 +94,7 @@
       };
       link = function (scope, element, attributes) {
         var container, image, settings, spinner, _this = this;
-        container = angular.element('<div>').addClass(SPINNER_CLASS_NAME);
+        container = angular.element('<div>').addClass(SPINNER_CLASS_NAME).css('position', 'relative');
         element.wrap(container);
         image = angular.element(element);
         settings = attributes.imageSpinnerSettings;
@@ -103,30 +104,52 @@
         settings = scope.$eval(settings);
         spinner = new SpinnerBuilder(image, settings);
         return function (spinner) {
-          var render;
+          var flow, render, showable;
           render = function (src) {
             if (isEmpty(src) || isEmpty(image.attr('width')) || isEmpty(image.attr('height'))) {
               return;
             }
             return spinner.show();
           };
-          scope.$watch(function () {
+          flow = function () {
+            var src;
+            src = image.attr('src');
+            if (showable()) {
+              render(src);
+              if (!isEmpty(src)) {
+                return spinner.container.show();
+              }
+            } else {
+              spinner.unspin();
+              return spinner.container.hide();
+            }
+          };
+          showable = function () {
             return !image.hasClass('ng-hide');
-          }, function (showable) {
-            if (showable == null) {
+          };
+          scope.$watch(function () {
+            return showable();
+          }, function (value) {
+            if (value == null) {
               return;
             }
-            if (showable) {
-              return render(image.attr('src'));
-            } else {
-              return spinner.remove();
-            }
+            return flow();
           });
           scope.$on('$destroy', function () {
-            return spinner.remove();
+            return spinner.container.hide();
           });
-          attributes.$observe('ng-src', render);
-          attributes.$observe('src', render);
+          attributes.$observe('ng-src', function (src) {
+            if (isEmpty(src)) {
+              return;
+            }
+            return flow();
+          });
+          attributes.$observe('src', function (src) {
+            if (isEmpty(src)) {
+              return;
+            }
+            return flow();
+          });
           attributes.$observe('width', function (width) {
             if (isEmpty(width)) {
               return;
