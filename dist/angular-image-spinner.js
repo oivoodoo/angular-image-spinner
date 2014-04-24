@@ -1,5 +1,5 @@
 (function () {
-  angular.module('imageSpinner', []).value('version', '0.0.2');
+  angular.module('imageSpinner', []).value('version', '0.0.5');
 }.call(this));
 ;
 (function () {
@@ -23,8 +23,8 @@
     hwaccel: false,
     className: 'spinner',
     zIndex: 2000000000,
-    top: '40%',
-    left: '30%'
+    top: '50%',
+    left: '50%'
   }).directive('imageSpinner', [
     '$window',
     'imageSpinnerDefaultSettings',
