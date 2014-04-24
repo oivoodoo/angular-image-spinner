@@ -42,10 +42,8 @@ describe 'imageSpinner', ->
 
         it 'should show image on load', ->
             image.onload()
-            expect(example
-                .find('div')
-                .find('img').css('display')
-            ).toEqual('block')
+            expect(example.find('div').find('img').css('display')).toEqual('block')
+            expect(example.find('.spinner-container').css('display')).toEqual('block')
 
         it 'should create the spinner in the container unlil the image is loaded', ->
             expect(example.find('.spinner-container .spinner').length).toEqual(1)
@@ -119,13 +117,12 @@ describe 'imageSpinner', ->
             scope.has = false
             scope.$digest()
             expect(example.find('.spinner-container .spinner').length).toEqual(0)
-            expect(example
-                .find('div')
-                .find('img').css('display')
-            ).toEqual('none')
+            expect(example.find('div').find('img').css('display')).toEqual('none')
+            expect(example.find('.spinner-container').css('display')).toEqual('none')
             scope.has = true
             scope.$digest()
             expect(example.find('.spinner-container .spinner').length).toEqual(1)
+            expect(example.find('.spinner-container').css('display')).toEqual('block')
 
     describe 'with ng-hide directive', ->
         beforeEach inject ($rootScope, $compile) ->
@@ -162,10 +159,10 @@ describe 'imageSpinner', ->
         it 'should not show image spinner', ->
             scope.has = true
             scope.$digest()
-            expect(example.find('.spinner-container .spinner').length).toEqual(1)
+            expect(example.find('.spinner-container').css('display')).toEqual('block')
             scope.has = false
             scope.$digest()
-            expect(example.find('.spinner-container .spinner').length).toEqual(0)
+            expect(example.find('.spinner-container').css('display')).toEqual('none')
 
     describe 'with bindable width and height', ->
         beforeEach inject ($rootScope, $compile) ->
