@@ -1,6 +1,6 @@
 {
   "name": "angular-image-picker",
-  "version": "0.0.1",
+  "version": "0.1.5",
   "description": "Angular directive for showing spinner in the container with image.",
   "main": "angular-image-picker.js",
   "scripts": {
