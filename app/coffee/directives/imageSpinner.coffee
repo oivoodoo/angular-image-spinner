@@ -27,7 +27,7 @@ angular.module('imageSpinner')
         class SpinnerBuilder
             constructor: (@el, @settings) ->
                 settings ?= {}
-                settings = angular.extend(settings, DefaultSettings)
+                settings = angular.extend(DefaultSettings, settings)
                 @spinner = new Spinner(settings)
 
                 @container = @el.parent()
