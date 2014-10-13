@@ -23,7 +23,7 @@ bower install angular-image-spinner --save
 
 ```javascript
 angular
-  .module('sfkatFrontApp', [
+  .module('example', [
     /**
     // your other used modules
     **/
