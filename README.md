@@ -10,10 +10,23 @@ image is preloading on the background.
 Also it's possible to pass spin.js settings using ```image-spinner-settings```
 attribute for ```img``` element.
 
+**Note: The directive will not be applied if you missed one of the parameters `width`, `height`.**
 
-## Install
+
+## Installation
 
 ```
 bower install angular-image-spinner --save
 ```
 
+**Then**, add `imageSpinner` module to your app:
+
+```javascript
+angular
+  .module('example', [
+    /**
+    // your other used modules
+    **/
+    'imageSpinner'
+  ])
+```
