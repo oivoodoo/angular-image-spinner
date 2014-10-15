@@ -1,5 +1,5 @@
 (function () {
-  angular.module('imageSpinner', []).value('version', '0.1.5');
+  angular.module('imageSpinner', []).value('version', '0.1.6');
 }.call(this));
 ;
 (function () {
@@ -40,7 +40,7 @@
           if (settings == null) {
             settings = {};
           }
-          settings = angular.extend(settings, DefaultSettings);
+          settings = angular.extend(DefaultSettings, settings);
           this.spinner = new Spinner(settings);
           this.container = this.el.parent();
           this.container.hide = function () {
