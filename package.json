@@ -1,15 +1,15 @@
 {
-  "name": "angular-image-picker",
+  "name": "angular-image-spinner",
   "version": "0.1.6",
   "description": "Angular directive for showing spinner in the container with image.",
-  "main": "angular-image-picker.js",
+  "main": "angular-image-spinner.js",
   "scripts": {
     "compile": "grunt build",
     "test": "grunt test"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/oivoodoo/angular-image-picker.git"
+    "url": "https://github.com/oivoodoo/angular-image-spinner.git"
   },
   "keywords": [
     "angular",
